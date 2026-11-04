@@ -1,0 +1,57 @@
+{
+  "name": "animaster",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "test": "node tests/engine.test.js",
+    "check": "node --check src/app.js && node --check src/engine.js && node --check server.js",
+    "build": "node build.js",
+    "prestart": "node build.js",
+    "predev": "node build.js",
+    "desktop": "npm run build && electron .",
+    "build:win": "npm run build && electron-builder --win portable --x64"
+  },
+  "devDependencies": {
+    "electron": "45.2.2",
+    "electron-builder": "26.18.0",
+    "pe-library": "2.0.1",
+    "resedit": "3.1.0"
+  },
+  "main": "desktop/main.cjs",
+  "description": "ANIMASTER — редактор анимации",
+  "author": "ANIMASTER",
+  "build": {
+    "appId": "com.animaster.studio",
+    "productName": "ANIMASTER",
+    "asar": true,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "desktop/main.cjs",
+      "assets/icon.png",
+      "package.json"
+    ],
+    "afterPack": "desktop/after-pack.cjs",
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico",
+      "signAndEditExecutable": false
+    },
+    "portable": {
+      "artifactName": "ANIMASTER-${version}-Windows.exe",
+      "requestExecutionLevel": "user"
+    }
+  }
+}

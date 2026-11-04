@@ -1,0 +1,62 @@
+name: Build and publish ANIMASTER for Windows
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing version tag to publish (for example v0.1.0)
+        required: true
+        default: v0.1.0
+
+permissions:
+  contents: write
+
+concurrency:
+  group: windows-release-${{ github.event.inputs.release_tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      RELEASE_TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
+    steps:
+      - name: Check out the release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install pinned build dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Check application
+        run: |
+          npm run check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm test
+      - name: Build Windows portable EXE
+        run: npm run build:win
+      - name: Calculate checksum
+        shell: pwsh
+        run: |
+          Get-FileHash dist/ANIMASTER-*-Windows.exe -Algorithm SHA256 | ForEach-Object {
+            "$($_.Hash.ToLower())  $([System.IO.Path]::GetFileName($_.Path))"
+          } | Set-Content dist/SHA256SUMS.txt
+      - name: Publish downloadable release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" dist/ANIMASTER-*-Windows.exe dist/SHA256SUMS.txt --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$RELEASE_TAG" dist/ANIMASTER-*-Windows.exe dist/SHA256SUMS.txt --verify-tag --repo "$GITHUB_REPOSITORY" --title "ANIMASTER $RELEASE_TAG — Windows" --notes-file desktop/RELEASE-NOTES.md
+          fi

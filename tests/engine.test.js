@@ -1,0 +1,30 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {poseAt,framePose,tweenSpan,transformPoint,constrainHandles,encodeWav,remapFrames,varyColor,spatialNoise,floodFill,removeColor} from '../src/engine.js';
+test('moving a key affects only that frame and explicit A frames',()=>{
+ const layer={keys:{0:{x:100,y:20,scale:2,opacity:.5},4:{x:300,y:60,scale:4,opacity:1}},tweens:[2]};
+ assert.deepEqual(framePose(layer,0),{rotation:0,...layer.keys[0]});
+ assert.deepEqual(framePose(layer,2),{x:200,y:40,scale:3,opacity:.75,rotation:0});
+ for(const f of [1,3,5])assert.deepEqual(framePose(layer,f),{x:0,y:0,scale:1,opacity:1,rotation:0});
+});
+test('interpolates every transform component between keys',()=>{const keys={0:{x:0,y:10,scale:1,opacity:1},10:{x:100,y:50,scale:2,opacity:0}};assert.deepEqual(poseAt(keys,5),{x:50,y:30,scale:1.5,opacity:.5,rotation:0});assert.deepEqual(poseAt(keys,-1),{rotation:0,...keys[0]});assert.deepEqual(poseAt(keys,20),{rotation:0,...keys[10]});});
+test('flood fill respects a separating boundary',()=>{const d=new Uint8ClampedArray([255,255,255,255,0,0,0,255,255,255,255,255]);floodFill(d,3,1,0,0,[255,0,0,255]);assert.deepEqual([...d],[255,0,0,255,0,0,0,255,255,255,255,255]);});
+test('color removal makes matching pixels transparent within tolerance',()=>{const d=new Uint8ClampedArray([250,250,250,255,12,40,70,255]);removeColor(d,[255,255,255,255],10);assert.equal(d[3],0);assert.equal(d[7],255);});
+
+test('A frames interpolate rotation and size while ordinary frames stay unchanged',()=>{const layer={keys:{0:{x:0,y:0,scale:1,opacity:1,rotation:0},4:{x:0,y:0,scale:2,opacity:1,rotation:180}},tweens:[2]};assert.equal(framePose(layer,2).rotation,90);assert.equal(framePose(layer,2).scale,1.5);assert.equal(framePose(layer,3).rotation,0);});
+test('drawing coordinates invert rotated and scaled layer transforms',()=>{const pose={x:25,y:70,scale:1.7,rotation:93};const point={x:123,y:222};const roundTrip=transformPoint(transformPoint(point,pose),pose,true);assert(Math.abs(roundTrip.x-point.x)<1e-9);assert(Math.abs(roundTrip.y-point.y)<1e-9);});
+
+test('independent axis scaling interpolates on A frames and inverts coordinates',()=>{const layer={keys:{0:{x:0,y:0,scale:1,scaleX:1,scaleY:2,opacity:1},4:{x:0,y:0,scale:1,scaleX:3,scaleY:4,opacity:1}},tweens:[2]};const pose=framePose(layer,2);assert.equal(pose.scaleX,2);assert.equal(pose.scaleY,3);const p={x:124,y:421},t={...pose,rotation:47};const out=transformPoint(transformPoint(p,t),t,true);assert(Math.abs(out.x-p.x)<1e-9);assert(Math.abs(out.y-p.y)<1e-9);});
+
+test('edit handles remain inside canvas when huge and off screen',()=>{const handles=[{point:{x:-9000,y:2000}},{point:{x:17000,y:-8000}},{point:{x:8000,y:5000}}];const result=constrainHandles(handles,960,540,40);for(const {point:p} of result){assert(p.x>=40&&p.x<=920);assert(p.y>=40&&p.y<=500);}});
+test('microphone WAV stores interleaved signed PCM and correct timing header',()=>{const wav=encodeWav([new Float32Array([-1,0,1]),new Float32Array([1,0,-1])],48000),v=new DataView(wav);assert.equal(wav.byteLength,56);assert.equal(v.getUint16(22,true),2);assert.equal(v.getUint32(24,true),48000);assert.equal(v.getUint32(40,true),12);assert.equal(v.getInt16(44,true),-32768);assert.equal(v.getInt16(46,true),32767);});
+
+test('color variation preserves exact base at zero and can lighten or darken',()=>{const rgb=[100,140,200];assert.deepEqual(varyColor(rgb,0,1),rgb);assert.deepEqual(varyColor(rgb,.5,1),[178,198,228]);assert.deepEqual(varyColor(rgb,.5,-1),[50,70,100]);assert.deepEqual(varyColor(rgb,1,-1),[0,0,0]);assert.deepEqual(varyColor(rgb,1,1),[255,255,255]);});
+test('spatial brightness noise is stable, bounded and continuous across cells',()=>{assert.equal(spatialNoise(10,20,42),spatialNoise(10,20,42));assert.notEqual(spatialNoise(10,20,42),spatialNoise(100,200,42));for(let i=-40;i<40;i++)assert(Math.abs(spatialNoise(i*13,i*11,42))<=1);assert(Math.abs(spatialNoise(17.999,10,42)-spatialNoise(18.001,10,42))<.001);});
+
+test('inserting a frame shifts keys, drawings and A frames without overwriting content',()=>{const picture={pixels:'original'},layer={keys:{4:{x:4},5:{x:5},9:{x:9}},drawings:{5:picture},tweens:[6,8]};const out=remapFrames(layer,f=>f>=5?f+1:f);assert.deepEqual(Object.keys(out.keys),['4','6','10']);assert.equal(out.drawings[6],picture);assert.deepEqual(out.tweens,[7,9]);assert.equal(layer.drawings[5],picture);});
+test('deleting a frame range closes the gap for all timeline data',()=>{const layer={keys:{0:{x:0},4:{x:4},7:{x:7},9:{x:9}},drawings:{4:'removed',7:'retained'},tweens:[3,5,8]},removed=[3,4,5];const out=remapFrames(layer,f=>removed.includes(f)?null:f-removed.filter(n=>n<f).length);assert.deepEqual(out.keys,{0:{x:0},4:{x:7},6:{x:9}});assert.deepEqual(out.drawings,{4:'retained'});assert.deepEqual(out.tweens,[5]);});
+
+test('trailing A frames wrap all transforms to the first key when looping',()=>{const first={x:0,y:10,scale:1,scaleX:1,scaleY:2,rotation:0,opacity:1},last={x:40,y:30,scale:3,scaleX:3,scaleY:4,rotation:180,opacity:0},layer={keys:{0:first,2:last},tweens:[3,4,5]};assert.deepEqual(tweenSpan(layer.keys,4,6,true),{before:2,after:0,t:.5});assert.deepEqual(framePose(layer,4,6,true),{x:20,y:20,scale:2,scaleX:2,scaleY:3,rotation:90,opacity:.5});assert.equal(framePose(layer,5,6,true).x,10);assert.equal(framePose(layer,5,6,false).x,40);assert.deepEqual(framePose(layer,1,6,true),{x:0,y:0,scale:1,rotation:0,opacity:1});});
+test('loop span continues across leading A frames and ignores hidden keys',()=>{const keys={2:{},4:{},20:{}};assert.deepEqual(tweenSpan(keys,7,8,true),{before:4,after:2,t:.5});assert.deepEqual(tweenSpan(keys,0,8,true),{before:4,after:2,t:2/3});assert.equal(tweenSpan(keys,7,8,false),null);assert.equal(tweenSpan({},7,8,true),null);});
+test('a looping layer with one key retains its appearance on A frames',()=>{const layer={keys:{0:{x:20,y:0,scale:2,rotation:45,opacity:1}},tweens:[1,2,3]};assert.deepEqual(framePose(layer,3,4,true),layer.keys[0]);});
