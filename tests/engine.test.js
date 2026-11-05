@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {poseAt,framePose,tweenSpan,transformPoint,cornersOf,validCorners,warpPoint,constrainHandles,encodeWav,remapFrames,varyColor,spatialNoise,floodFill,removeColor} from '../src/engine.js';
+import {poseAt,framePose,tweenSpan,transformPoint,cornersOf,validCorners,warpPoint,constrainHandles,encodeWav,yearAt,levelDb,noiseOpacity,pcmLevelDb,remapFrames,varyColor,spatialNoise,floodFill,removeColor} from '../src/engine.js';
 test('moving a key affects only that frame and explicit A frames',()=>{
  const layer={keys:{0:{x:100,y:20,scale:2,opacity:.5},4:{x:300,y:60,scale:4,opacity:1}},tweens:[2]};
  assert.deepEqual(framePose(layer,0),{rotation:0,...layer.keys[0]});
@@ -31,3 +31,7 @@ test('a looping layer with one key retains its appearance on A frames',()=>{cons
 
 test('perspective transform maps every source corner and inverts drawing coordinates',()=>{const target=[{x:140,y:60},{x:850,y:20},{x:930,y:500},{x:10,y:450}];assert(validCorners(target));for(const [i,p] of cornersOf().entries()){const actual=warpPoint(p,target);assert(Math.abs(actual.x-target[i].x)<1e-8);assert(Math.abs(actual.y-target[i].y)<1e-8);}const pose={x:35,y:40,scale:1.2,scaleX:1.1,scaleY:.8,rotation:23,corners:target},point={x:381,y:217},roundTrip=transformPoint(transformPoint(point,pose),pose,true);assert(Math.abs(roundTrip.x-point.x)<1e-8);assert(Math.abs(roundTrip.y-point.y)<1e-8);});
 test('free corners interpolate on A frames, including the loop boundary',()=>{const a={x:0,y:0,scale:1,opacity:1,rotation:0},b={...a,corners:[{x:160,y:80},{x:900,y:10},{x:930,y:500},{x:30,y:520}]},layer={keys:{0:a,2:b},tweens:[1,3]};assert.deepEqual(framePose(layer,1).corners[0],{x:80,y:40});assert.deepEqual(framePose(layer,3,4,true).corners[0],{x:80,y:40});assert.equal(framePose(layer,4,6,true).corners,undefined);assert(!validCorners([{x:0,y:0},{x:960,y:540},{x:960,y:0},{x:0,y:540}]));});
+
+test('map years interpolate inclusive endpoints and support a single frame',()=>{assert.equal(yearAt(1900,2000,0,11),1900);assert.equal(yearAt(1900,2000,5,11),1950);assert.equal(yearAt(1900,2000,10,11),2000);assert.equal(yearAt(-100,100,1,3),0);assert.equal(yearAt(1900,2000,0,1),1900);});
+test('audio shading maps 0 dB to transparent and -100 dB to black',()=>{assert.equal(noiseOpacity(levelDb(1)),0);assert.equal(noiseOpacity(levelDb(0)),1);assert(Math.abs(noiseOpacity(levelDb(.1))-.2)<1e-10);});
+test('offline audio analysis follows time and does not cancel opposite stereo phases',()=>{const a=new Float32Array(48000).fill(.1),b=new Float32Array(48000).fill(-.1),source={sampleRate:48000,channels:[a,b]};assert(Math.abs(pcmLevelDb([source],0)+20)<.001);assert.equal(pcmLevelDb([source],2),-100);assert.equal(pcmLevelDb([],0),-100);});

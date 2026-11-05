@@ -14,7 +14,7 @@ let browser;
  const page=await browser.newPage({viewport:{width:1440,height:1100},acceptDownloads:true});
  const errors=[];page.on('pageerror',error=>errors.push(error.message));
  await page.route('**/*',route=>route.request().isNavigationRequest()?route.fulfill({contentType:'text/html',body:fs.readFileSync(path.join(root,'index.html'),'utf8')}):route.abort());
- await page.goto('http://localhost:5173');await page.waitForSelector('.layer');
+ await page.goto('http://localhost:5173');await page.waitForSelector('.layer');await page.locator('#newProject').click();
  const fixture=async data=>{await page.locator('#projectFile').setInputFiles({name:'test.animaster',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(data))});await page.waitForFunction(()=>document.querySelector('#status').textContent==='Проект открыт.');};
  const cell=f=>page.locator('#tracks .track').first().locator('.cell').nth(f);
  const pixel=(x,y)=>page.evaluate(([x,y])=>{const canvas=document.querySelector('#stage'),g=canvas.getContext('2d');return [...g.getImageData(Math.round(x*canvas.width/960),Math.round(y*canvas.height/540),1,1).data];},[x,y]);
@@ -55,11 +55,11 @@ let browser;
  for(let i=0;i<3;i++){await page.locator('#templates').click();assert.equal(await page.locator('.template-card').count(),3);await page.locator('.template-card').nth(i).click();await page.waitForFunction(n=>document.querySelectorAll('.layer').length===n,before+i+1);assert.equal(await page.locator('.layer').count(),before+i+1);}
  assert.deepEqual(await page.locator('.layer-name').allTextContents(),['Карта Африки','Карта Европы','Карта мира','Shape']);
  const count=await page.locator('.layer').count();await page.locator('#helpButton').click();assert(await page.locator('#tutorialTitle').isVisible());await page.locator('#tutorialDialog').evaluate(d=>{d.tabIndex=-1;d.focus();});await page.keyboard.press('Space');assert.equal(await page.locator('.layer').count(),count,'tutorial must not trigger editing shortcuts');
- for(let i=0;i<6;i++){assert((await page.locator('#tutorialCounter').textContent()).includes(String(i+1)));await page.locator('#tutorialNext').click();}
+ for(let i=0;i<9;i++){assert((await page.locator('#tutorialCounter').textContent()).includes(String(i+1)));await page.locator('#tutorialNext').click();}
  assert(!(await page.locator('#tutorialDialog').isVisible()));
  await page.setViewportSize({width:760,height:620});await page.locator('#templates').click();assert(await page.locator('#templatesTitle').isVisible());await page.locator('#templatesDialog .close').click();
  await page.setViewportSize({width:390,height:844});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'mobile should not scroll horizontally');
  for(let i=1;i<await page.locator('.layer').count();i++)await page.locator('.layer').nth(i).locator('button').first().click();
  if(process.env.SCREENSHOT_DIR){fs.mkdirSync(process.env.SCREENSHOT_DIR,{recursive:true});await page.screenshot({path:path.join(process.env.SCREENSHOT_DIR,'mobile.png'),fullPage:true});await page.setViewportSize({width:1440,height:1100});await page.screenshot({path:path.join(process.env.SCREENSHOT_DIR,'desktop.png'),fullPage:true});}
- assert.deepEqual(errors,[]);console.log('PASS three offline map templates, six tutorial steps and responsive layout; no browser errors');
+ assert.deepEqual(errors,[]);console.log('PASS three offline map templates, nine tutorial steps and responsive layout; no browser errors');
 })().then(async()=>{await browser?.close();}).catch(async error=>{console.error(error);await browser?.close();process.exitCode=1;});

@@ -42,6 +42,18 @@ export function transformPoint(point,pose,inverse=false){
 }
 
 export function axisScales(pose){return {sx:pose.scale*(pose.scaleX??1),sy:pose.scale*(pose.scaleY??1)};}
+export function yearAt(start,end,frame,total){return Math.round(start+(end-start)*(total<=1?0:Math.max(0,Math.min(total-1,frame))/(total-1)));}
+export function levelDb(rms){return Math.max(-100,Math.min(0,20*Math.log10(Math.max(1e-5,rms))));}
+export function noiseOpacity(db){return Math.max(0,Math.min(1,-db/100));}
+export function pcmLevelDb(sources,time,windowSize=1024){
+ if(!sources.length)return -100;let energy=0;
+ for(let i=0;i<windowSize;i++){
+  let left=0,right=0;
+  for(const source of sources){const index=Math.floor((time+i/48000)*source.sampleRate),a=source.channels[0]?.[index]||0,b=source.channels[1]?.[index]??a;left+=a;right+=b;}
+  energy+=(left*left+right*right)/2;
+ }
+ return levelDb(Math.sqrt(energy/windowSize));
+}
 export function remapFrames(layer,map){
  const remap=entries=>Object.fromEntries(Object.entries(entries).flatMap(([f,value])=>{const next=map(Number(f));return next===null?[]:[[next,value]];}));
  return {...layer,keys:remap(layer.keys),drawings:remap(layer.drawings),tweens:layer.tweens.flatMap(f=>{const next=map(f);return next===null?[]:[next];})};

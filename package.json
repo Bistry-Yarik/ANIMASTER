@@ -1,19 +1,19 @@
 {
   "name": "animaster",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "node server.js",
     "start": "node server.js",
-    "test": "node tests/engine.test.js",
-    "check": "node --check src/app.js && node --check src/engine.js && node --check src/warp.js && node --check src/templates.js && node --check server.js && node --check desktop/main.cjs",
+    "test": "node tests/engine.test.js && node tests/library.test.cjs",
+    "check": "node --check src/app.js && node --check src/engine.js && node --check src/warp.js && node --check src/templates.js && node --check server.js && node --check desktop/main.cjs && node --check src/studio.js && node --check desktop/preload.cjs && node --check desktop/library.cjs",
     "build": "node build.js",
     "prestart": "node build.js",
     "predev": "node build.js",
     "desktop": "npm run build && electron .",
     "build:win": "npm run build && electron-builder --win portable --x64",
-    "test:ui": "npm run build && node tests/editor-browser.cjs"
+    "test:ui": "npm run build && node tests/editor-browser.cjs && node tests/studio-browser.cjs"
   },
   "devDependencies": {
     "electron": "45.2.2",
@@ -35,7 +35,10 @@
     "files": [
       "index.html",
       "desktop/main.cjs",
+      "desktop/preload.cjs",
+      "desktop/library.cjs",
       "assets/icon.png",
+      "assets/flags/LICENSE",
       "package.json"
     ],
     "afterPack": "desktop/after-pack.cjs",
