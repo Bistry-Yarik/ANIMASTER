@@ -4,7 +4,7 @@ export function poseAt(keys,frame){
  let a=sorted[0],b=sorted.at(-1);
  if(frame<=a)return {rotation:0,...keys[a]};if(frame>=b)return {rotation:0,...keys[b]};
  for(let i=1;i<sorted.length;i++)if(sorted[i]>=frame){a=sorted[i-1];b=sorted[i];break;}
- const t=(frame-a)/(b-a),fields=['x','y','scale','opacity','rotation'];for(const axis of ['scaleX','scaleY'])if(keys[a][axis]!==undefined||keys[b][axis]!==undefined)fields.push(axis);return Object.fromEntries(fields.map(k=>{const fallback=k==='scaleX'||k==='scaleY'?1:0;return [k,(keys[a][k]??fallback)+((keys[b][k]??fallback)-(keys[a][k]??fallback))*t];}));
+ const t=(frame-a)/(b-a),fields=['x','y','scale','opacity','rotation'];for(const axis of ['scaleX','scaleY'])if(keys[a][axis]!==undefined||keys[b][axis]!==undefined)fields.push(axis);const result=Object.fromEntries(fields.map(k=>{const fallback=k==='scaleX'||k==='scaleY'?1:0;return [k,(keys[a][k]??fallback)+((keys[b][k]??fallback)-(keys[a][k]??fallback))*t];}));if(keys[a].corners||keys[b].corners){const start=cornersOf(keys[a]),end=cornersOf(keys[b]);result.corners=start.map((p,i)=>({x:p.x+(end[i].x-p.x)*t,y:p.y+(end[i].y-p.y)*t}));}return result;
 }
 export function tweenSpan(keys,frame,total=0,loop=false){
  const sorted=Object.keys(keys).map(Number).filter(f=>f>=0&&(!total||f<total)).sort((a,b)=>a-b);
@@ -33,12 +33,12 @@ export function floodFill(data,width,height,x,y,color,tolerance=24){
  while(stack.length){const p=stack.pop();if(seen[p])continue;seen[p]=1;const o=p*4;if(!target.every((v,i)=>Math.abs(data[o+i]-v)<=tolerance))continue;
  data.set(color,o);const px=p%width;if(px)stack.push(p-1);if(px<width-1)stack.push(p+1);if(p>=width)stack.push(p-width);if(p<width*(height-1))stack.push(p+width);}
 }
-export function removeColor(data,color,tolerance){for(let i=0;i<data.length;i+=4)if(Math.max(...color.slice(0,3).map((v,c)=>Math.abs(data[i+c]-v)))<=tolerance)data[i+3]=0;}
+export function removeColor(data,color,tolerance){const [r,g,b]=color;for(let i=0;i<data.length;i+=4)if(Math.abs(data[i]-r)<=tolerance&&Math.abs(data[i+1]-g)<=tolerance&&Math.abs(data[i+2]-b)<=tolerance)data[i+3]=0;}
 
 export function transformPoint(point,pose,inverse=false){
  const {sx,sy}=axisScales(pose),angle=(pose.rotation||0)*Math.PI/180,c=Math.cos(angle),n=Math.sin(angle),cx=pose.x+480*sx,cy=pose.y+270*sy;
- if(inverse){const x=point.x-cx,y=point.y-cy;return {x:(x*c+y*n)/sx+480,y:(-x*n+y*c)/sy+270};}
- const x=(point.x-480)*sx,y=(point.y-270)*sy;return {x:cx+x*c-y*n,y:cy+x*n+y*c};
+ if(inverse){const x=point.x-cx,y=point.y-cy,p={x:(x*c+y*n)/sx+480,y:(-x*n+y*c)/sy+270};return pose.corners?warpPoint(p,pose.corners,true):p;}
+ const warped=pose.corners?warpPoint(point,pose.corners):point;const x=(warped.x-480)*sx,y=(warped.y-270)*sy;return {x:cx+x*c-y*n,y:cy+x*n+y*c};
 }
 
 export function axisScales(pose){return {sx:pose.scale*(pose.scaleX??1),sy:pose.scale*(pose.scaleY??1)};}
@@ -69,4 +69,24 @@ export function constrainHandles(handles,width,height,margin){
  const factor=Math.min(preferred,(width-2*margin)/Math.max(1,maxX-minX),(height-2*margin)/Math.max(1,maxY-minY));
  const w=(maxX-minX)*factor,h=(maxY-minY)*factor,left=Math.max(margin,Math.min(width-margin-w,minX)),top=Math.max(margin,Math.min(height-margin-h,minY));
  return handles.map(handle=>({...handle,point:{x:left+(handle.point.x-minX)*factor,y:top+(handle.point.y-minY)*factor}}));
+}
+
+export function cornersOf(pose={}){return pose.corners||[{x:0,y:0},{x:960,y:0},{x:960,y:540},{x:0,y:540}];}
+export function validCorners(points){
+ if(!Array.isArray(points)||points.length!==4||!points.every(p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.y)))return false;
+ return points.every((a,i)=>{const b=points[(i+1)%4],c=points[(i+2)%4];return (b.x-a.x)*(c.y-b.y)-(b.y-a.y)*(c.x-b.x)>.001;});
+}
+export function quadMatrix(points){
+ const [p0,p1,p2,p3]=points,dx1=p1.x-p2.x,dx2=p3.x-p2.x,dx3=p0.x-p1.x+p2.x-p3.x,dy1=p1.y-p2.y,dy2=p3.y-p2.y,dy3=p0.y-p1.y+p2.y-p3.y;
+ let g=0,h=0;
+ if(Math.abs(dx3)+Math.abs(dy3)>1e-9){const det=dx1*dy2-dx2*dy1;if(Math.abs(det)<1e-9)return null;g=(dx3*dy2-dx2*dy3)/det;h=(dx1*dy3-dx3*dy1)/det;}
+ return [(p1.x-p0.x+g*p1.x)/960,(p3.x-p0.x+h*p3.x)/540,p0.x,(p1.y-p0.y+g*p1.y)/960,(p3.y-p0.y+h*p3.y)/540,p0.y,g/960,h/540,1];
+}
+export function projectPoint(p,m){const w=m[6]*p.x+m[7]*p.y+m[8];return Math.abs(w)<1e-12?{x:Infinity,y:Infinity}:{x:(m[0]*p.x+m[1]*p.y+m[2])/w,y:(m[3]*p.x+m[4]*p.y+m[5])/w};}
+export function warpPoint(p,points,inverse=false){
+ const m=quadMatrix(points);if(!m)return {x:Infinity,y:Infinity};
+ if(!inverse)return projectPoint(p,m);
+ const [a,b,c,d,e,f,g,h,i]=m,det=a*(e*i-f*h)-b*(d*i-f*g)+c*(d*h-e*g);
+ if(Math.abs(det)<1e-12)return {x:Infinity,y:Infinity};
+ return projectPoint(p,[(e*i-f*h)/det,(c*h-b*i)/det,(b*f-c*e)/det,(f*g-d*i)/det,(a*i-c*g)/det,(c*d-a*f)/det,(d*h-e*g)/det,(b*g-a*h)/det,(a*e-b*d)/det]);
 }

@@ -14,7 +14,7 @@ module.exports=async function afterPack(context){
  if(!groups.length)ResEdit.Resource.IconGroupEntry.replaceIconsForResource(resources.entries,101,1033,icon.icons.map(item=>item.data));
  for(const version of ResEdit.Resource.VersionInfo.fromEntries(resources.entries)){
   version.setStringValues({lang:1033,codepage:1200},{FileDescription:'ANIMASTER — animation studio',ProductName:'ANIMASTER',CompanyName:'ANIMASTER',OriginalFilename:'ANIMASTER.exe',InternalName:'ANIMASTER'});
-  version.setFileVersion(0,1,0,0,1033);version.setProductVersion(0,1,0,0,1033);version.outputToResourceEntries(resources.entries);
+  const [major,minor,patch]=context.packager.appInfo.version.split('.').map(Number);version.setFileVersion(major,minor,patch,0,1033);version.setProductVersion(major,minor,patch,0,1033);version.outputToResourceEntries(resources.entries);
  }
  resources.outputResource(exe);
  await fs.writeFile(exePath,Buffer.from(exe.generate()));

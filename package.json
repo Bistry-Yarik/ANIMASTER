@@ -1,23 +1,25 @@
 {
   "name": "animaster",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "node server.js",
     "start": "node server.js",
     "test": "node tests/engine.test.js",
-    "check": "node --check src/app.js && node --check src/engine.js && node --check server.js",
+    "check": "node --check src/app.js && node --check src/engine.js && node --check src/warp.js && node --check src/templates.js && node --check server.js && node --check desktop/main.cjs",
     "build": "node build.js",
     "prestart": "node build.js",
     "predev": "node build.js",
     "desktop": "npm run build && electron .",
-    "build:win": "npm run build && electron-builder --win portable --x64"
+    "build:win": "npm run build && electron-builder --win portable --x64",
+    "test:ui": "npm run build && node tests/editor-browser.cjs"
   },
   "devDependencies": {
     "electron": "45.2.2",
     "electron-builder": "26.18.0",
     "pe-library": "2.0.1",
+    "playwright-core": "1.64.1",
     "resedit": "3.1.0"
   },
   "main": "desktop/main.cjs",

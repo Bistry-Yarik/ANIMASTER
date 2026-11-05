@@ -2,24 +2,20 @@ name: Build and publish ANIMASTER for Windows
 
 on:
   push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/windows-release.yml'
     tags:
       - 'v*'
   workflow_dispatch:
     inputs:
       release_tag:
-        description: Existing version tag to publish (for example v0.1.0)
+        description: Existing version tag to publish (for example v0.2.0)
         required: true
-        default: v0.1.0
+        default: v0.2.0
 
 permissions:
   contents: write
 
 concurrency:
-  group: windows-release-${{ github.event.inputs.release_tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || 'v0.1.0' }}
+  group: windows-release-${{ github.event.inputs.release_tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || 'v0.2.0' }}
   cancel-in-progress: false
 
 jobs:
@@ -27,7 +23,7 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 30
     env:
-      RELEASE_TAG: ${{ github.event.inputs.release_tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || 'v0.1.0' }}
+      RELEASE_TAG: ${{ github.event.inputs.release_tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || 'v0.2.0' }}
     steps:
       - name: Check out the release tag
         uses: actions/checkout@v4
@@ -39,13 +35,21 @@ jobs:
           node-version: '24'
           cache: npm
       - name: Install pinned build dependencies
+        id: install
         run: npm ci --no-audit --no-fund
       - name: Check application
+        id: check
         run: |
           npm run check
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           npm test
+      - name: Verify editor in Chrome
+        id: browser
+        env:
+          BROWSER_EXECUTABLE: C:\Program Files\Google\Chrome\Application\chrome.exe
+        run: npm run test:ui
       - name: Build Windows portable EXE
+        id: build
         run: npm run build:win
       - name: Calculate checksum
         shell: pwsh
@@ -54,6 +58,7 @@ jobs:
             "$($_.Hash.ToLower())  $([System.IO.Path]::GetFileName($_.Path))"
           } | Set-Content dist/SHA256SUMS.txt
       - name: Publish downloadable release
+        id: publish
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -81,6 +86,11 @@ jobs:
             source_commit = $env:RELEASE_SOURCE
             run_url = "https://github.com/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
             release_url = "https://github.com/$env:GITHUB_REPOSITORY/releases/tag/$env:RELEASE_TAG"
+            install_result = '${{ steps.install.outcome }}'
+            check_result = '${{ steps.check.outcome }}'
+            browser_result = '${{ steps.browser.outcome }}'
+            build_result = '${{ steps.build.outcome }}'
+            publish_result = '${{ steps.publish.outcome }}'
             completed_at = [DateTime]::UtcNow.ToString('o')
           }
           $report | ConvertTo-Json | Set-Content desktop/release-status.json -Encoding utf8
