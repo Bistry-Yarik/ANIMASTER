@@ -1,6 +1,6 @@
 import {readFile,writeFile} from 'node:fs/promises';
 const read=path=>readFile(new URL(path,import.meta.url),'utf8');
-const [shell,css,engine,warp,territories,studio,app,logo]=await Promise.all(['src/shell.html','src/style.css','src/engine.js','src/warp.js','src/territories.js','src/studio.js','src/app.js','logo.svg'].map(read));
+const [shell,css,engine,warp,territories,media,studio,app,logo]=await Promise.all(['src/shell.html','src/style.css','src/engine.js','src/warp.js','src/territories.js','src/media.js','src/studio.js','src/app.js','logo.svg'].map(read));
 const regions=JSON.parse(await read('assets/maps/regions.json'));
 const templates=await Promise.all([['world','Карта мира'],['europe','Карта Европы'],['africa','Карта Африки'],...regions.map(r=>[r.id,r.name])].map(async([id,name])=>({id,name,src:'data:image/svg+xml;base64,'+Buffer.from(await read('assets/maps/'+id+'.svg')).toString('base64')})));
 const countries=JSON.parse(await read('assets/maps/countries.json'));
@@ -10,7 +10,7 @@ const templateCode='export const MAP_TEMPLATES='+JSON.stringify(templates)+';\ne
 await writeFile(new URL('src/templates.js',import.meta.url),templateCode);
 const icon='data:image/svg+xml;base64,'+Buffer.from(logo).toString('base64');
 const inline=source=>source.replace(/^import .*?;\s*/gm,'').replaceAll('export function ','function ').replaceAll('export const ','const ');
-const code=[engine,warp,templateCode,territories,studio,app].map(inline).join('\n');
+const code=[engine,warp,templateCode,territories,media,studio,app].map(inline).join('\n');
 const flagLicense=await read('assets/flags/LICENSE');
 const html=shell.replace('</head>',()=>`<!-- Flag icons: ${flagLicense} -->\n</head>`).replace('<link rel="stylesheet" href="/src/style.css">',()=>'<style>'+css+'</style>').replaceAll('/logo.svg',icon).replace('<script type="module" src="/src/app.js"></script>',()=>'<script type="module">'+code.replaceAll('</script','<\\/script')+'</script>');
 await writeFile(new URL('index.html',import.meta.url),html);

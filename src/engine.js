@@ -54,7 +54,7 @@ export function pcmLevelDb(sources,time,windowSize=1024){
  if(!sources.length)return -100;let energy=0;
  for(let i=0;i<windowSize;i++){
   let left=0,right=0;
-  for(const source of sources){const index=Math.floor((time+i/48000)*source.sampleRate),a=source.channels[0]?.[index]||0,b=source.channels[1]?.[index]??a;left+=a;right+=b;}
+  for(const source of sources){const t=time+i/48000;if(t<(source.start??0)||t>=(source.end??Infinity))continue;const index=Math.floor(((source.offset??0)+(t-(source.start??0))*(source.rate??1))*source.sampleRate),a=source.channels[0]?.[index]||0,b=source.channels[1]?.[index]??a,gain=source.volume??1;left+=a*gain;right+=b*gain;}
   energy+=(left*left+right*right)/2;
  }
  return levelDb(Math.sqrt(energy/windowSize));
