@@ -2,16 +2,18 @@ import {quadMatrix,projectPoint,validCorners} from './engine.js';
 
 // Piecewise affine textured triangles approximate a perspective transform.
 // The ordinary (unwarped) path never allocates a mesh.
-export function drawWarp(target,source,corners){
+export function drawWarp(target,source,corners,bounds={x:0,y:0,w:960,h:540}){
  if(!validCorners(corners))return;
- const m=quadMatrix(corners);if(!m)return;
- if(Math.abs(m[6])+Math.abs(m[7])<1e-10){target.save();target.transform(m[0],m[3],m[1],m[4],m[2],m[5]);target.drawImage(source,0,0,960,540);target.restore();return;}
+ const m=quadMatrix(corners,bounds);if(!m)return;
+ target.save();target.beginPath();corners.forEach((p,i)=>i?target.lineTo(p.x,p.y):target.moveTo(p.x,p.y));target.closePath();target.clip();
+ if(Math.abs(m[6])+Math.abs(m[7])<1e-10){target.save();target.transform(m[0],m[3],m[1],m[4],m[2],m[5]);target.drawImage(source,0,0,960,540);target.restore();target.restore();return;}
  const steps=12,points=[];
- for(let y=0;y<=steps;y++)for(let x=0;x<=steps;x++){const p={x:x*960/steps,y:y*540/steps};points.push({source:p,destination:projectPoint(p,m)});}
+ for(let y=0;y<=steps;y++)for(let x=0;x<=steps;x++){const p={x:bounds.x+x*bounds.w/steps,y:bounds.y+y*bounds.h/steps};points.push({source:p,destination:projectPoint(p,m)});}
  for(let y=0;y<steps;y++)for(let x=0;x<steps;x++){
   const a=points[y*(steps+1)+x],b=points[y*(steps+1)+x+1],c=points[(y+1)*(steps+1)+x+1],d=points[(y+1)*(steps+1)+x];
   triangle(target,source,[a,b,c]);triangle(target,source,[a,c,d]);
  }
+ target.restore();
 }
 function triangle(ctx,image,vertices){
  const [a,b,c]=vertices.map(v=>v.source),[p,q,r]=vertices.map(v=>v.destination);

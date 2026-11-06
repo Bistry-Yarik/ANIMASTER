@@ -43,7 +43,7 @@ let browser;
  await fixture({version:1,name:'Corner interpolation',fps:4,total:4,loop:true,layers:[{kind:'image',name:'Shape',visible:true,freeCorners:true,keys:{0:identity,2:{...identity,corners}},tweens:[1,3],canvas:solid,src:solid,mime:'image/png',drawings:{}}]});
  await cell(1).click();color=await pixel(20,20);assert.equal(color[3],0,'A-frame corner should move halfway');assert.equal((await pixel(500,270))[3],255);
  await cell(3).click();assert.equal((await pixel(20,20))[3],0,'loop A frame should interpolate corners too');
- await cell(0).click();await page.locator('[data-tool=move]').click();box=await page.locator('#stage').boundingBox();const margin=22*960/box.width;
+ await cell(0).click();await page.locator('[data-tool=move]').click();box=await page.locator('#stage').boundingBox();const margin=10*960/box.width;
  await page.mouse.move(box.x+margin*box.width/960,box.y+margin*box.height/540);await page.mouse.down();await page.mouse.move(box.x+(margin+60)*box.width/960,box.y+(margin+40)*box.height/540);await page.mouse.up();
  downloadPromise=page.waitForEvent('download');await page.locator('#save').click();download=await downloadPromise;const warpedPath=path.join(temp,'warped.animaster');await download.saveAs(warpedPath);const saved=JSON.parse(fs.readFileSync(warpedPath,'utf8'));
  assert(Math.abs(saved.layers[0].keys[0].corners[0].x-60)<1);assert(Math.abs(saved.layers[0].keys[0].corners[0].y-40)<1);assert.equal(saved.layers[0].keys[0].scale,1,'corner dragging must not scale entire layer');
