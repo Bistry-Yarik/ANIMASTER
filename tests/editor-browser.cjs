@@ -52,7 +52,7 @@ let browser;
  console.log('PASS free corners: perspective raster, direct corner drag, A/loop interpolation, project round-trip and reset');
 
  const before=await page.locator('.layer').count();
- for(let i=0;i<3;i++){await page.locator('#templates').click();assert.equal(await page.locator('.template-card').count(),3);await page.locator('.template-card').nth(i).click();await page.waitForFunction(n=>document.querySelectorAll('.layer').length===n,before+i+1);assert.equal(await page.locator('.layer').count(),before+i+1);}
+ for(let i=0;i<3;i++){await page.locator('#templates').click();assert.equal(await page.locator('.template-card').count(),7);await page.locator('.template-card').nth(i).click();await page.waitForFunction(n=>document.querySelectorAll('.layer').length===n,before+i+1);assert.equal(await page.locator('.layer').count(),before+i+1);}
  assert.deepEqual(await page.locator('.layer-name').allTextContents(),['Карта Африки','Карта Европы','Карта мира','Shape']);
  const count=await page.locator('.layer').count();await page.locator('#helpButton').click();assert(await page.locator('#tutorialTitle').isVisible());await page.locator('#tutorialDialog').evaluate(d=>{d.tabIndex=-1;d.focus();});await page.keyboard.press('Space');assert.equal(await page.locator('.layer').count(),count,'tutorial must not trigger editing shortcuts');
  for(let i=0;i<9;i++){assert((await page.locator('#tutorialCounter').textContent()).includes(String(i+1)));await page.locator('#tutorialNext').click();}
@@ -61,5 +61,5 @@ let browser;
  await page.setViewportSize({width:390,height:844});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'mobile should not scroll horizontally');
  for(let i=1;i<await page.locator('.layer').count();i++)await page.locator('.layer').nth(i).locator('button').first().click();
  if(process.env.SCREENSHOT_DIR){fs.mkdirSync(process.env.SCREENSHOT_DIR,{recursive:true});await page.screenshot({path:path.join(process.env.SCREENSHOT_DIR,'mobile.png'),fullPage:true});await page.setViewportSize({width:1440,height:1100});await page.screenshot({path:path.join(process.env.SCREENSHOT_DIR,'desktop.png'),fullPage:true});}
- assert.deepEqual(errors,[]);console.log('PASS three offline map templates, nine tutorial steps and responsive layout; no browser errors');
+ assert.deepEqual(errors,[]);console.log('PASS seven offline map templates, nine tutorial steps and responsive layout; no browser errors');
 })().then(async()=>{await browser?.close();}).catch(async error=>{console.error(error);await browser?.close();process.exitCode=1;});

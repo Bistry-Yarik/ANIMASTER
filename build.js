@@ -1,7 +1,8 @@
 import {readFile,writeFile} from 'node:fs/promises';
 const read=path=>readFile(new URL(path,import.meta.url),'utf8');
 const [shell,css,engine,warp,territories,studio,app,logo]=await Promise.all(['src/shell.html','src/style.css','src/engine.js','src/warp.js','src/territories.js','src/studio.js','src/app.js','logo.svg'].map(read));
-const templates=await Promise.all([['world','Карта мира'],['europe','Карта Европы'],['africa','Карта Африки']].map(async([id,name])=>({id,name,src:'data:image/svg+xml;base64,'+Buffer.from(await read('assets/maps/'+id+'.svg')).toString('base64')})));
+const regions=JSON.parse(await read('assets/maps/regions.json'));
+const templates=await Promise.all([['world','Карта мира'],['europe','Карта Европы'],['africa','Карта Африки'],...regions.map(r=>[r.id,r.name])].map(async([id,name])=>({id,name,src:'data:image/svg+xml;base64,'+Buffer.from(await read('assets/maps/'+id+'.svg')).toString('base64')})));
 const countries=JSON.parse(await read('assets/maps/countries.json'));
 const codes=[...new Set(Object.values(countries).flatMap(m=>m.countries.map(c=>c.code)))];
 const flags=Object.fromEntries(await Promise.all(codes.map(async code=>[code,'data:image/svg+xml;base64,'+Buffer.from(await read('assets/flags/'+code+'.svg')).toString('base64')])));
