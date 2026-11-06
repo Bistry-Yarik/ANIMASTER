@@ -23,3 +23,5 @@ export function envelopeAt(envelope,from,to,volume=1){
  for(let i=start;i<end;i++){sum+=envelope.rms[i]**2;peak=Math.max(peak,envelope.peaks[i]);}return {rms:Math.sqrt(sum/Math.max(1,end-start))*volume,peak:peak*volume};
 }
 export function arrowRate(elapsed){return [5,10,20,40,60,80,100][Math.min(6,Math.max(0,Math.floor(elapsed/1000)))];}
+
+export function arrowDistance(elapsed){const seconds=Math.max(0,elapsed)/1000,rates=[5,10,20,40,60,80,100];let steps=0;for(let i=0;i<rates.length;i++)steps+=Math.max(0,Math.min(i===rates.length-1?Infinity:1,seconds-i))*rates[i];return Math.floor(steps+1e-7);}
