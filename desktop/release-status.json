@@ -1,13 +1,13 @@
 {
   "status": "success",
-  "tag": "v0.3.0",
-  "source_commit": "5e88f48b473a49b75a771d2450297410f6208395",
-  "run_url": "https://github.com/Bistry-Yarik/ANIMASTER/actions/runs/42048249528",
-  "release_url": "https://github.com/Bistry-Yarik/ANIMASTER/releases/tag/v0.3.0",
+  "tag": "v0.4.0",
+  "source_commit": "e9e2b1640916c581ecd83341b13ced01cbe6cc87",
+  "run_url": "https://github.com/Bistry-Yarik/ANIMASTER/actions/runs/42182872160",
+  "release_url": "https://github.com/Bistry-Yarik/ANIMASTER/releases/tag/v0.4.0",
   "install_result": "success",
   "check_result": "success",
   "browser_result": "success",
   "build_result": "success",
   "publish_result": "success",
-  "completed_at": "2026-11-05T14:50:36.7081485Z"
+  "completed_at": "2026-11-06T07:48:49.0188596Z"
 }
