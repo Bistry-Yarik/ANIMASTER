@@ -2,9 +2,9 @@ import {territoryComponents,paintTerritory,encodeOwners,decodeOwners} from './te
 import {MAP_COUNTRIES,COUNTRY_FLAGS} from './templates.js';
 export const TEXT_FONTS=['Arial','Verdana','Georgia','Times New Roman','Courier New','sans-serif'];
 const flagCache=new Map();
-export function loadFlag(code){
- if(!flagCache.has(code))flagCache.set(code,new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(Error('Флаг не загрузился: '+code));image.src=COUNTRY_FLAGS[code];}));
- return flagCache.get(code);
+export function loadFlag(code,src=COUNTRY_FLAGS[code]){
+ if(!flagCache.has(src))flagCache.set(src,new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(Error('Флаг не загрузился: '+code));image.src=src;}));
+ return flagCache.get(src);
 }
 export function textSurface(layer){
  const data=layer.textData,key=JSON.stringify(data);if(layer.textCache===key)return layer.canvas;
@@ -13,9 +13,9 @@ export function textSurface(layer){
 }
 export async function prepareMap(layer,data,regenerate=true){
  const definition=MAP_COUNTRIES[data.id];if(!definition)throw Error('Неизвестный шаблон карты');
- const codes=[...new Set(definition.countries.map(c=>c.code))];
- layer.flagImages=Object.fromEntries(await Promise.all(codes.map(async code=>[code,await loadFlag(code)])));
- layer.mapData={id:data.id,yearStart:Number.isFinite(data.yearStart)?data.yearStart:1900,yearEnd:Number.isFinite(data.yearEnd)?data.yearEnd:2026,selectedFlag:codes.includes(data.selectedFlag)?data.selectedFlag:codes[0],ownershipVersion:1,legacyTerritories:data.legacyTerritories===true||(!regenerate&&!data.ownershipVersion)};
+ const custom=Array.isArray(data.customCountries)?data.customCountries:[];if(custom.some(c=>!/^custom-[a-zA-Z0-9-]+$/.test(c.id)||typeof c.name!=='string'||!c.name.trim()||c.name.length>80||typeof c.flag!=='string'||!c.flag.startsWith('data:image/png;base64,')))throw Error('Некорректная страна');const codes=[...new Set([...definition.countries.map(c=>c.code),...custom.map(c=>c.id)])];
+ layer.flagImages=Object.fromEntries(await Promise.all(codes.map(async code=>[code,await loadFlag(code,custom.find(c=>c.id===code)?.flag||COUNTRY_FLAGS[code])])));
+ layer.mapData={customCountries:structuredClone(custom),id:data.id,yearStart:Number.isFinite(data.yearStart)?data.yearStart:1900,yearEnd:Number.isFinite(data.yearEnd)?data.yearEnd:2026,selectedFlag:codes.includes(data.selectedFlag)?data.selectedFlag:codes[0],ownershipVersion:1,legacyTerritories:data.legacyTerritories===true||(!regenerate&&!data.ownershipVersion)};
  layer.mapDefinition=definition;layer.mapPaths=definition.countries.map(c=>({...c,path:new Path2D(c.d),parts:(c.parts||[c]).map(part=>({...part,path:new Path2D(part.d)}))}));layer.landPath=new Path2D(definition.countries.map(c=>c.d).join(''));
  layer.ownerCodes=codes;layer.mapOwners={};layer.baseOwners=new Uint16Array(960*540);
  const mask=document.createElement('canvas');mask.width=960;mask.height=540;const mg=mask.getContext('2d',{willReadFrequently:true}),clip=definition.clip;

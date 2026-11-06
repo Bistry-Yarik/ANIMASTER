@@ -22,4 +22,4 @@ export function envelopeAt(envelope,from,to,volume=1){
  if(!envelope)return {rms:0,peak:0};const start=Math.max(0,Math.floor(from/envelope.secondsPerBin)),end=Math.min(envelope.rms.length,Math.max(start+1,Math.ceil(to/envelope.secondsPerBin)));let sum=0,peak=0;
  for(let i=start;i<end;i++){sum+=envelope.rms[i]**2;peak=Math.max(peak,envelope.peaks[i]);}return {rms:Math.sqrt(sum/Math.max(1,end-start))*volume,peak:peak*volume};
 }
-export function arrowRate(elapsed){return elapsed<1000?5:elapsed<2000?10:20;}
+export function arrowRate(elapsed){return [5,10,20,40,60,80,100][Math.min(6,Math.max(0,Math.floor(elapsed/1000)))];}
