@@ -1,6 +1,6 @@
 import {readFile,writeFile} from 'node:fs/promises';
 const read=path=>readFile(new URL(path,import.meta.url),'utf8');
-const [shell,css,engine,warp,territories,media,groups,pitch,studio,i18n,app,logo]=await Promise.all(['src/shell.html','src/style.css','src/engine.js','src/warp.js','src/territories.js','src/media.js','src/groups.js','src/pitch.js','src/studio.js','src/i18n.js','src/app.js','logo.svg'].map(read));
+const [shell,css,engine,warp,territories,media,groups,curves,pitch,studio,i18n,app]=await Promise.all(['src/shell.html','src/style.css','src/engine.js','src/warp.js','src/territories.js','src/media.js','src/groups.js','src/curves.js','src/pitch.js','src/studio.js','src/i18n.js','src/app.js'].map(read));
 const regions=JSON.parse(await read('assets/maps/regions.json'));
 const templates=await Promise.all([['world','Карта мира'],['europe','Карта Европы'],['africa','Карта Африки'],...regions.map(r=>[r.id,r.name])].map(async([id,name])=>({id,name,src:'data:image/svg+xml;base64,'+Buffer.from(await read('assets/maps/'+id+'.svg')).toString('base64')})));
 const countries=JSON.parse(await read('assets/maps/countries.json'));
@@ -10,9 +10,9 @@ const templateCode='export const MAP_TEMPLATES='+JSON.stringify(templates)+';\ne
 await writeFile(new URL('src/templates.js',import.meta.url),templateCode);
 const translationCode='export const UI_TRANSLATIONS='+JSON.stringify(JSON.parse(await read('assets/locales/ui.json')))+';\n';
 await writeFile(new URL('src/translations.js',import.meta.url),translationCode);
-const icon='data:image/svg+xml;base64,'+Buffer.from(logo).toString('base64');
+const icon='data:image/png;base64,'+(await readFile(new URL('assets/icon.png',import.meta.url))).toString('base64');
 const inline=source=>source.replace(/^import .*?;\s*/gm,'').replaceAll('export function ','function ').replaceAll('export const ','const ');
-const code=[engine,warp,templateCode,translationCode,territories,media,groups,pitch,studio,i18n,app].map(inline).join('\n');
+const code=[engine,warp,templateCode,translationCode,territories,media,groups,curves,pitch,studio,i18n,app].map(inline).join('\n');
 const flagLicense=await read('assets/flags/LICENSE');
 const html=shell.replace('</head>',()=>`<!-- Flag icons: ${flagLicense} -->\n</head>`).replace('<link rel="stylesheet" href="/src/style.css">',()=>'<style>'+css+'</style>').replaceAll('/logo.svg',icon).replace('<script type="module" src="/src/app.js"></script>',()=>'<script type="module">'+code.replaceAll('</script','<\\/script')+'</script>');
 await writeFile(new URL('index.html',import.meta.url),html);

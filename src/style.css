@@ -38,3 +38,5 @@
 #language{order:10;width:106px;min-width:70px;font-size:11px;padding:7px}html[data-language=ar] .properties,html[data-language=ar] dialog{direction:rtl;text-align:right}html[data-language=ar] .grid,html[data-language=ar] .timeline{direction:ltr}@media(max-width:1200px){#language{width:90px}header{gap:6px}}@media(max-width:800px){#language{order:0;width:100px}}
 
 .track-ruler-name{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.cell.alt-guide{color:#8cf3ff!important;background:#196b7638;font-size:8px;border-bottom:2px solid #71d9ed}#addAlt{color:#8cf3ff}

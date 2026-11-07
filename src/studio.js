@@ -9,7 +9,7 @@ export function loadFlag(code,src=COUNTRY_FLAGS[code]){
 export function textSurface(layer){
  const data=layer.textData,key=JSON.stringify(data);if(layer.textCache===key)return layer.canvas;
  const g=layer.canvas.getContext('2d');g.clearRect(0,0,960,540);g.font=`${data.size}px "${data.font}"`;g.textBaseline='top';g.lineJoin='round';g.fillStyle=data.color;g.strokeStyle=data.outline;g.lineWidth=data.outlineWidth*2;
- data.text.split('\n').forEach((line,i)=>{const y=data.y+i*data.size*1.25;if(data.outlineWidth>0)g.strokeText(line,data.x,y);g.fillText(line,data.x,y);});layer.textCache=key;return layer.canvas;
+ data.text.split('\n').forEach((line,i)=>{const y=data.y+i*data.size*1.25;if(data.outlineWidth>0)g.strokeText(line,data.x,y);g.fillText(line,data.x,y);});layer.textCache=key;layer.guideRevision=(layer.guideRevision||0)+1;layer.canvas.guideRevision=(layer.canvas.guideRevision||0)+1;return layer.canvas;
 }
 export async function prepareMap(layer,data,regenerate=true){
  const definition=MAP_COUNTRIES[data.id];if(!definition)throw Error('Неизвестный шаблон карты');

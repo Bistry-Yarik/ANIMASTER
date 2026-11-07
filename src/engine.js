@@ -61,7 +61,7 @@ export function pcmLevelDb(sources,time,windowSize=1024){
 }
 export function remapFrames(layer,map){
  const remap=entries=>Object.fromEntries(Object.entries(entries).flatMap(([f,value])=>{const next=map(Number(f));return next===null?[]:[[next,value]];}));
- return {...layer,audioKeys:layer.audioKeys?remap(layer.audioKeys):undefined,mapOwners:layer.mapOwners?remap(layer.mapOwners):undefined,keys:remap(layer.keys),drawings:remap(layer.drawings),tweens:layer.tweens.flatMap(f=>{const next=map(f);return next===null?[]:[next];})};
+ return {...layer,altFrames:layer.altFrames?remap(layer.altFrames):undefined,audioKeys:layer.audioKeys?remap(layer.audioKeys):undefined,mapOwners:layer.mapOwners?remap(layer.mapOwners):undefined,keys:remap(layer.keys),drawings:remap(layer.drawings),tweens:layer.tweens.flatMap(f=>{const next=map(f);return next===null?[]:[next];})};
 }
 export function varyColor(rgb,amount,sample){
  const shift=Math.max(-1,Math.min(1,sample))*Math.max(0,Math.min(1,amount));

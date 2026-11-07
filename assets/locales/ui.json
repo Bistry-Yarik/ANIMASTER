@@ -2088,5 +2088,27 @@
     "প্রকল্প খোলা হচ্ছে…",
     "Abrindo projeto…",
     "Membuka proyek…"
+  ],
+  "AltA: редактируйте опорную точку кривой. N возвращает A.": [
+    "AltA: edit the curve guide. N restores A.",
+    "AltA：编辑曲线引导点。N 恢复 A。",
+    "AltA: वक्र का मार्गदर्शक बदलें। N से A लौटाएँ।",
+    "AltA: edita la guía de curva. N restaura A.",
+    "AltA : modifiez le guide de courbe. N rétablit A.",
+    "AltA: عدّل نقطة المنحنى. N يعيد A.",
+    "AltA: বক্ররেখার নির্দেশক বদলান। N দিয়ে A ফেরান।",
+    "AltA: edite o guia da curva. N restaura A.",
+    "AltA: edit pemandu kurva. N memulihkan A."
+  ],
+  "Alt превращает A в AltA. Редактируйте его, чтобы получить плавную кривую; N возвращает обычный A.": [
+    "Alt changes A to AltA. Edit the guide for a smooth curve; N restores A.",
+    "Alt 将 A 变为 AltA。编辑引导点可形成平滑曲线，N 恢复普通 A。",
+    "Alt से A को AltA बनाएँ। मार्गदर्शक बदलकर चिकना वक्र बनाएँ; N से A लौटता है।",
+    "Alt convierte A en AltA. Edita la guía para una curva suave; N restaura A.",
+    "Alt transforme A en AltA. Modifiez le guide pour une courbe fluide ; N rétablit A.",
+    "Alt يحوّل A إلى AltA. عدّل النقطة لمنحنى سلس؛ N يعيد A.",
+    "Alt দিয়ে A থেকে AltA করুন। মসৃণ বক্ররেখার জন্য নির্দেশক বদলান; N দিয়ে A ফেরে।",
+    "Alt transforma A em AltA. Edite o guia para uma curva suave; N restaura A.",
+    "Alt mengubah A menjadi AltA. Edit pemandu agar kurva mulus; N memulihkan A."
   ]
 }

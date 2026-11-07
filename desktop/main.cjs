@@ -10,6 +10,7 @@ if(!singleInstance)app.quit();
 let window;
 function createWindow(){
  window=new BrowserWindow({title:'ANIMASTER',width:1440,height:1000,minWidth:760,minHeight:620,backgroundColor:'#18191e',icon:path.join(__dirname,'../assets/icon.png'),show:false,autoHideMenuBar:true,webPreferences:{preload:path.join(__dirname,'preload.cjs'),nodeIntegration:false,contextIsolation:true,sandbox:true}});
+ window.setMenu(null);
  window.webContents.setWindowOpenHandler(()=>({action:'deny'}));
  window.webContents.on('will-navigate',(event,url)=>{if(url!==window.webContents.getURL())event.preventDefault();});
  window.once('ready-to-show',()=>window.show());
