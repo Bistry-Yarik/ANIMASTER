@@ -40,3 +40,5 @@
 .track-ruler-name{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 .cell.alt-guide{color:#8cf3ff!important;background:#196b7638;font-size:8px;border-bottom:2px solid #71d9ed}#addAlt{color:#8cf3ff}
+
+#theme{max-width:115px;font-size:11px;padding:6px}html[data-theme="dark"]{background:#09090d;color:#dad9e4}html[data-theme="dark"] header,html[data-theme="dark"] .tools,html[data-theme="dark"] .properties,html[data-theme="dark"] .timeline{background:#101016}html[data-theme="dark"] .stage-area,html[data-theme="dark"] .canvas-area{background:#0b0b10}html[data-theme="dark"] button,html[data-theme="dark"] input,html[data-theme="dark"] select{background-color:#181820;border-color:#30303c}html[data-theme="dark"] button.active{background:#7155ed}html[data-theme="dark"] #stage{background:conic-gradient(#22212c 25%,#2b2936 0 50%,#22212c 0 75%,#2b2936 0) 0 0/20px 20px}html[data-theme="dark"] .primary{background:#adf086;color:#172114}

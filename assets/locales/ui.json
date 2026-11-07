@@ -2110,5 +2110,71 @@
     "Alt দিয়ে A থেকে AltA করুন। মসৃণ বক্ররেখার জন্য নির্দেশক বদলান; N দিয়ে A ফেরে।",
     "Alt transforma A em AltA. Edite o guia para uma curva suave; N restaura A.",
     "Alt mengubah A menjadi AltA. Edit pemandu agar kurva mulus; N memulihkan A."
+  ],
+  "Тема": [
+    "Theme",
+    "主题",
+    "थीम",
+    "Tema",
+    "Thème",
+    "السمة",
+    "থিম",
+    "Tema",
+    "Tema"
+  ],
+  "Классическая": [
+    "Classic",
+    "经典",
+    "क्लासिक",
+    "Clásica",
+    "Classique",
+    "كلاسيكية",
+    "ক্লাসিক",
+    "Clássico",
+    "Klasik"
+  ],
+  "Тёмная": [
+    "Dark",
+    "深色",
+    "डार्क",
+    "Oscura",
+    "Sombre",
+    "داكنة",
+    "গাঢ়",
+    "Escuro",
+    "Gelap"
+  ],
+  "Тряска": [
+    "Shake",
+    "抖动",
+    "कंपन",
+    "Temblor",
+    "Tremblement",
+    "اهتزاز",
+    "কম্পন",
+    "Tremor",
+    "Guncangan"
+  ],
+  "Размытие": [
+    "Blur",
+    "模糊",
+    "धुंधलापन",
+    "Desenfoque",
+    "Flou",
+    "تمويه",
+    "ঝাপসা",
+    "Desfoque",
+    "Buram"
+  ],
+  "Тряска смещает A и AltA кадры. Размытие 100% — средний цвет изображения. Значения плавно переходят между ключами.": [
+    "Shake offsets A and AltA frames. Blur at 100% gives the average image color. Values transition smoothly between keys.",
+    "抖动偏移 A 和 AltA 帧。100% 模糊显示图像平均颜色。数值在关键帧之间平滑过渡。",
+    "कंपन A और AltA फ़्रेम को खिसकाता है। 100% धुंधलापन औसत रंग देता है। मान मुख्य फ़्रेम के बीच बदलते हैं।",
+    "El temblor desplaza los fotogramas A y AltA. Al 100%, el desenfoque muestra el color medio. Los valores cambian suavemente entre claves.",
+    "Le tremblement décale les images A et AltA. À 100 %, le flou donne la couleur moyenne. Les valeurs évoluent entre les clés.",
+    "يزيح الاهتزاز إطارات A وAltA. تمويه 100% يعطي متوسط لون الصورة. تنتقل القيم بسلاسة بين المفاتيح.",
+    "কম্পন A ও AltA ফ্রেম সরায়। ১০০% ঝাপসা ছবির গড় রং দেয়। মান কী ফ্রেমের মধ্যে মসৃণভাবে বদলায়।",
+    "O tremor desloca quadros A e AltA. O desfoque a 100% mostra a cor média. Os valores mudam suavemente entre chaves.",
+    "Guncangan menggeser bingkai A dan AltA. Buram 100% menghasilkan warna rata-rata. Nilai bertransisi mulus antar bingkai kunci."
   ]
 }

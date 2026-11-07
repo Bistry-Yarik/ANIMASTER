@@ -12,3 +12,10 @@ test('guide curves wrap across the loop boundary and audio channels remain indep
 test('insertion and deletion remap AltA metadata with its drawing',()=>{const layer={keys:{0:p},drawings:{5:'paint'},tweens:[5],altFrames:{5:guides[5]}};const shifted=remapFrames(layer,f=>f>=3?f+1:f);assert.equal(shifted.altFrames[6],guides[5]);assert.equal(shifted.drawings[6],'paint');assert.deepEqual(remapFrames(shifted,f=>f===6?null:f).altFrames,{});});
 test('AltA at an implicit media boundary overrides its default value',()=>{const p0={...p,y:-60},guide={0:{pose:p0,fields:['y']}};assert.equal(guidedPose({0:p,10:p},guide,0,11,false,p).y,-60);assert.equal(guidedAudio({0:{volume:1,pitch:0},10:{volume:1,pitch:0}},{0:{audio:{volume:1,pitch:12},audioFields:['pitch']}},0,11,false,{volume:1,pitch:0}).pitch,12);});
 test('without Q keys a loop is a smooth closed curve through AltA controls, including frame zero',()=>{const controls={0:{pose:{...p,y:-60},fields:['y']},5:{pose:{...p,x:100,y:20},fields:['x','y']}};const at=f=>guidedPose({},controls,f,10,true,p),e=.0001;assert.equal(at(0).y,-60);assert.equal(at(5).y,20);assert(Math.abs((at(0).y-at(10-e).y)/e-(at(e).y-at(0).y)/e)<.1);assert(Math.abs(guidedPose({},{4:{pose:{...p,y:30},fields:['y']}},0,10,true,p).y-30)<1e-9);});
+test('effect intensity fades on A and follows AltA with bounded values',()=>{
+ const effects={0:{...p,shake:10,blur:100},20:{...p,shake:0,blur:0}};
+ assert.equal(poseAt(effects,4).shake,8);assert.equal(poseAt(effects,16).blur,20);
+ const controls={10:{pose:{...p,shake:80,blur:90},fields:['shake','blur']}};
+ const middle=guidedPose(effects,controls,10,21,false,poseAt(effects,10));assert.equal(middle.shake,80);assert.equal(middle.blur,90);
+ for(let f=0;f<=20;f+=.1){const q=guidedPose(effects,controls,f,21,false,poseAt(effects,f));assert(q.shake>=0&&q.shake<=100&&q.blur>=0&&q.blur<=100);}
+});

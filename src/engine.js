@@ -4,7 +4,7 @@ export function poseAt(keys,frame){
  let a=sorted[0],b=sorted.at(-1);
  if(frame<=a)return {rotation:0,...keys[a]};if(frame>=b)return {rotation:0,...keys[b]};
  for(let i=1;i<sorted.length;i++)if(sorted[i]>=frame){a=sorted[i-1];b=sorted[i];break;}
- const t=(frame-a)/(b-a),fields=['x','y','scale','opacity','rotation'];for(const axis of ['scaleX','scaleY'])if(keys[a][axis]!==undefined||keys[b][axis]!==undefined)fields.push(axis);const result=Object.fromEntries(fields.map(k=>{const fallback=k==='scaleX'||k==='scaleY'?1:0;return [k,(keys[a][k]??fallback)+((keys[b][k]??fallback)-(keys[a][k]??fallback))*t];}));if(keys[a].corners||keys[b].corners){
+ const t=(frame-a)/(b-a),fields=['x','y','scale','opacity','rotation'];for(const axis of ['scaleX','scaleY','shake','blur'])if(keys[a][axis]!==undefined||keys[b][axis]!==undefined)fields.push(axis);const result=Object.fromEntries(fields.map(k=>{const fallback=k==='scaleX'||k==='scaleY'?1:0;return [k,(keys[a][k]??fallback)+((keys[b][k]??fallback)-(keys[a][k]??fallback))*t];}));if(keys[a].corners||keys[b].corners){
   const domains=[keys[a].warpBounds,keys[b].warpBounds].filter(Boolean);let domain;
   if(domains.length){const x=Math.min(...domains.map(v=>v.x)),y=Math.min(...domains.map(v=>v.y)),right=Math.max(...domains.map(v=>v.x+v.w)),bottom=Math.max(...domains.map(v=>v.y+v.h));domain={x,y,w:right-x,h:bottom-y};result.warpBounds=domain;}
   const points=rectCorners(domain),mapped=key=>points.map(p=>key.corners?warpPoint(p,key.corners,false,key.warpBounds):p),start=mapped(keys[a]),end=mapped(keys[b]);
