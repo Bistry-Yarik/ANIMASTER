@@ -1,4 +1,4 @@
-name: Build and publish ANIMASTER for Windows
+name: Build and publish AMS for Windows
 
 on:
   push:
@@ -7,15 +7,15 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: Existing version tag to publish (for example v0.9.1)
+        description: Existing version tag to publish (for example v2.0.0)
         required: true
-        default: v0.9.1
+        default: v2.0.0
 
 permissions:
   contents: write
 
 concurrency:
-  group: windows-release-${{ github.event.inputs.release_tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || 'v0.9.1' }}
+  group: windows-release-${{ github.event.inputs.release_tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || 'v2.0.0' }}
   cancel-in-progress: false
 
 jobs:
@@ -23,7 +23,7 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 30
     env:
-      RELEASE_TAG: ${{ github.event.inputs.release_tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || 'v0.9.1' }}
+      RELEASE_TAG: ${{ github.event.inputs.release_tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || 'v2.0.0' }}
     steps:
       - name: Check out the release tag
         uses: actions/checkout@v4
@@ -54,7 +54,7 @@ jobs:
       - name: Calculate checksum
         shell: pwsh
         run: |
-          Get-FileHash dist/ANIMASTER-*-Windows.exe -Algorithm SHA256 | ForEach-Object {
+          Get-FileHash dist/AMS-*-Windows.exe -Algorithm SHA256 | ForEach-Object {
             "$($_.Hash.ToLower())  $([System.IO.Path]::GetFileName($_.Path))"
           } | Set-Content dist/SHA256SUMS.txt
       - name: Publish downloadable release
@@ -65,9 +65,9 @@ jobs:
         run: |
           set -euo pipefail
           if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" dist/ANIMASTER-*-Windows.exe dist/SHA256SUMS.txt --clobber --repo "$GITHUB_REPOSITORY"
+            gh release upload "$RELEASE_TAG" dist/AMS-*-Windows.exe dist/SHA256SUMS.txt --clobber --repo "$GITHUB_REPOSITORY"
           else
-            gh release create "$RELEASE_TAG" dist/ANIMASTER-*-Windows.exe dist/SHA256SUMS.txt --verify-tag --repo "$GITHUB_REPOSITORY" --title "ANIMASTER $RELEASE_TAG — Windows" --notes-file desktop/RELEASE-NOTES.md
+            gh release create "$RELEASE_TAG" dist/AMS-*-Windows.exe dist/SHA256SUMS.txt --verify-tag --repo "$GITHUB_REPOSITORY" --title "AMS $RELEASE_TAG — Windows" --notes-file desktop/RELEASE-NOTES.md
           fi
       - name: Save release result for verification over Git
         if: always()

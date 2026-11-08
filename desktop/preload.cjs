@@ -7,3 +7,5 @@ contextBridge.exposeInMainWorld('animasterLibrary',Object.freeze({
  openFolder:()=>ipcRenderer.invoke('library:open-folder'),
  chooseFolder:()=>ipcRenderer.invoke('library:choose-folder')
 }));
+
+contextBridge.exposeInMainWorld('animasterClipboard',Object.freeze({files:()=>ipcRenderer.invoke('clipboard:files'),text:()=>ipcRenderer.invoke('clipboard:text')}));

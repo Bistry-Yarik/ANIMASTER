@@ -13,7 +13,7 @@ module.exports=async function afterPack(context){
  for(const group of groups)ResEdit.Resource.IconGroupEntry.replaceIconsForResource(resources.entries,group.id,group.lang,icon.icons.map(item=>item.data));
  if(!groups.length)ResEdit.Resource.IconGroupEntry.replaceIconsForResource(resources.entries,101,1033,icon.icons.map(item=>item.data));
  for(const version of ResEdit.Resource.VersionInfo.fromEntries(resources.entries)){
-  version.setStringValues({lang:1033,codepage:1200},{FileDescription:'ANIMASTER — animation studio',ProductName:'ANIMASTER',CompanyName:'ANIMASTER',OriginalFilename:'ANIMASTER.exe',InternalName:'ANIMASTER'});
+  version.setStringValues({lang:1033,codepage:1200},{FileDescription:'AMS — Animaster Steam 2.0',ProductName:'AMS',CompanyName:'ANIMASTER',OriginalFilename:'AMS.exe',InternalName:'AMS'});
   const [major,minor,patch]=context.packager.appInfo.version.split('.').map(Number);version.setFileVersion(major,minor,patch,0,1033);version.setProductVersion(major,minor,patch,0,1033);version.outputToResourceEntries(resources.entries);
  }
  resources.outputResource(exe);

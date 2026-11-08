@@ -1,19 +1,19 @@
 {
   "name": "animaster",
-  "version": "0.9.1",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "node server.js",
     "start": "node server.js",
-    "test": "node tests/engine.test.js && node tests/library.test.cjs && node tests/territories.test.js && node tests/media.test.js && node tests/groups.test.js && node tests/locales.test.js && node tests/curves.test.js",
-    "check": "node --check src/app.js && node --check src/engine.js && node --check src/warp.js && node --check src/templates.js && node --check server.js && node --check desktop/main.cjs && node --check src/studio.js && node --check desktop/preload.cjs && node --check desktop/library.cjs && node --check src/territories.js && node --check src/media.js && node --check src/groups.js && node --check src/pitch.js && node --check src/i18n.js && node --check src/translations.js && node --check src/curves.js",
+    "test": "node tests/engine.test.js && node tests/library.test.cjs && node tests/territories.test.js && node tests/media.test.js && node tests/groups.test.js && node tests/locales.test.js && node tests/curves.test.js && node tests/community.test.js && node tests/clipboard.test.cjs",
+    "check": "node --check src/app.js && node --check src/engine.js && node --check src/warp.js && node --check src/templates.js && node --check server.js && node --check desktop/main.cjs && node --check src/studio.js && node --check desktop/preload.cjs && node --check desktop/library.cjs && node --check src/territories.js && node --check src/media.js && node --check src/groups.js && node --check src/pitch.js && node --check src/i18n.js && node --check src/translations.js && node --check src/curves.js && node --check src/community.js && node --check src/community-ui.js && node --check desktop/clipboard.cjs",
     "build": "node build.js",
     "prestart": "node build.js",
     "predev": "node build.js",
     "desktop": "npm run build && electron .",
     "build:win": "npm run build && electron-builder --win portable --x64",
-    "test:ui": "npm run build && node tests/editor-browser.cjs && node tests/studio-browser.cjs && node tests/frames-browser.cjs && node tests/upgrades-browser.cjs && node tests/media-browser.cjs && node tests/selection-browser.cjs && node tests/alta-browser.cjs && node tests/effects-browser.cjs && node tests/mirror-fonts-browser.cjs",
+    "test:ui": "npm run build && node tests/editor-browser.cjs && node tests/studio-browser.cjs && node tests/frames-browser.cjs && node tests/upgrades-browser.cjs && node tests/media-browser.cjs && node tests/selection-browser.cjs && node tests/alta-browser.cjs && node tests/effects-browser.cjs && node tests/mirror-fonts-browser.cjs && node tests/ams-browser.cjs",
     "build:icon": "node scripts/build-icon.cjs"
   },
   "devDependencies": {
@@ -24,11 +24,11 @@
     "resedit": "3.1.0"
   },
   "main": "desktop/main.cjs",
-  "description": "ANIMASTER — редактор анимации",
+  "description": "AMS — Animaster Steam 2.0 · локальная версия",
   "author": "ANIMASTER",
   "build": {
     "appId": "com.animaster.studio",
-    "productName": "ANIMASTER",
+    "productName": "AMS",
     "asar": true,
     "directories": {
       "output": "dist"
@@ -41,7 +41,8 @@
       "assets/icon.png",
       "assets/flags/LICENSE",
       "package.json",
-      "assets/fonts/*-OFL.txt"
+      "assets/fonts/*-OFL.txt",
+      "desktop/clipboard.cjs"
     ],
     "afterPack": "desktop/after-pack.cjs",
     "win": {
@@ -57,7 +58,7 @@
       "signAndEditExecutable": false
     },
     "portable": {
-      "artifactName": "ANIMASTER-${version}-Windows.exe",
+      "artifactName": "AMS-${version}-Windows.exe",
       "requestExecutionLevel": "user"
     }
   }
