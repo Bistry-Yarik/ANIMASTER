@@ -14,7 +14,7 @@ export function audioPose(keys,frame,start,end,loop=false){
 export function groupPose(base,reference,next){
  const result={...base};for(const key of ['x','y','rotation','opacity',...['shake','blur'].filter(k=>base[k]!==undefined||reference[k]!==undefined||next[k]!==undefined)])result[key]=(base[key]??(key==='opacity'?1:0))+(next[key]??0)-(reference[key]??0);
  for(const field of ['shake','blur'].filter(k=>result[k]!==undefined))result[field]=Math.max(0,Math.min(100,result[field]??0));
- result.opacity=Math.max(0,Math.min(1,result.opacity));for(const key of ['scale','scaleX','scaleY'])result[key]=(base[key]??1)*(next[key]??1)/(reference[key]??1);
+ result.opacity=Math.max(0,Math.min(1,result.opacity));for(const key of ['scale','scaleX','scaleY'])result[key]=(base[key]??1)*(next[key]??1)/(reference[key]??1);for(const key of ['mirrorX','mirrorY'])if(base[key]!==undefined||reference[key]!==undefined||next[key]!==undefined)result[key]=(reference[key]??1)===0?(base[key]??1):(base[key]??1)*(next[key]??1)/(reference[key]??1);
  if(next.corners){const bounds=next.warpBounds||reference.warpBounds,points=rectCorners(bounds),at=(pose,p)=>pose.corners?warpPoint(p,pose.corners,false,pose.warpBounds):p;
   const corners=points.map(p=>{const a=at(base,p),b=at(reference,p),c=at(next,p);return {x:a.x+c.x-b.x,y:a.y+c.y-b.y};});if(!validCorners(corners))return null;result.corners=corners;if(bounds)result.warpBounds={...bounds};
  }

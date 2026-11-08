@@ -4,7 +4,7 @@ export function poseAt(keys,frame){
  let a=sorted[0],b=sorted.at(-1);
  if(frame<=a)return {rotation:0,...keys[a]};if(frame>=b)return {rotation:0,...keys[b]};
  for(let i=1;i<sorted.length;i++)if(sorted[i]>=frame){a=sorted[i-1];b=sorted[i];break;}
- const t=(frame-a)/(b-a),fields=['x','y','scale','opacity','rotation'];for(const axis of ['scaleX','scaleY','shake','blur'])if(keys[a][axis]!==undefined||keys[b][axis]!==undefined)fields.push(axis);const result=Object.fromEntries(fields.map(k=>{const fallback=k==='scaleX'||k==='scaleY'?1:0;return [k,(keys[a][k]??fallback)+((keys[b][k]??fallback)-(keys[a][k]??fallback))*t];}));if(keys[a].corners||keys[b].corners){
+ const t=(frame-a)/(b-a),fields=['x','y','scale','opacity','rotation'];for(const axis of ['scaleX','scaleY','shake','blur','mirrorX','mirrorY'])if(keys[a][axis]!==undefined||keys[b][axis]!==undefined)fields.push(axis);const result=Object.fromEntries(fields.map(k=>{const fallback=['scaleX','scaleY','mirrorX','mirrorY'].includes(k)?1:0;return [k,(keys[a][k]??fallback)+((keys[b][k]??fallback)-(keys[a][k]??fallback))*t];}));if(keys[a].corners||keys[b].corners){
   const domains=[keys[a].warpBounds,keys[b].warpBounds].filter(Boolean);let domain;
   if(domains.length){const x=Math.min(...domains.map(v=>v.x)),y=Math.min(...domains.map(v=>v.y)),right=Math.max(...domains.map(v=>v.x+v.w)),bottom=Math.max(...domains.map(v=>v.y+v.h));domain={x,y,w:right-x,h:bottom-y};result.warpBounds=domain;}
   const points=rectCorners(domain),mapped=key=>points.map(p=>key.corners?warpPoint(p,key.corners,false,key.warpBounds):p),start=mapped(keys[a]),end=mapped(keys[b]);
@@ -46,7 +46,7 @@ export function transformPoint(point,pose,inverse=false){
  const warped=pose.corners?warpPoint(point,pose.corners,false,pose.warpBounds):point;const x=(warped.x-480)*sx,y=(warped.y-270)*sy;return {x:cx+x*c-y*n,y:cy+x*n+y*c};
 }
 
-export function axisScales(pose){return {sx:pose.scale*(pose.scaleX??1),sy:pose.scale*(pose.scaleY??1)};}
+export function axisScales(pose){return {sx:pose.scale*(pose.scaleX??1)*(pose.mirrorX??1),sy:pose.scale*(pose.scaleY??1)*(pose.mirrorY??1)};}
 export function yearAt(start,end,frame,total){return Math.round(start+(end-start)*(total<=1?0:Math.max(0,Math.min(total-1,frame))/(total-1)));}
 export function levelDb(rms){return Math.max(-100,Math.min(0,20*Math.log10(Math.max(1e-5,rms))));}
 export function noiseOpacity(db){return Math.max(0,Math.min(1,-db/100));}

@@ -17,7 +17,7 @@ export function splineWeights(nodes,frame){
  tangent(left,(t3-2*t2+t)*dt);tangent(right,(t3-t2)*dt);return weights;
 }
 const value=(nodes,weights,read)=>nodes.reduce((sum,node,i)=>sum+weights[i]*read(node,i),0);
-const defaults={x:0,y:0,scale:1,scaleX:1,scaleY:1,opacity:1,rotation:0,shake:0,blur:0};
+const defaults={x:0,y:0,scale:1,scaleX:1,scaleY:1,opacity:1,rotation:0,shake:0,blur:0,mirrorX:1,mirrorY:1};
 export function guidedPose(keys,guides,frame,total,loop,base){
  if(Object.hasOwn(keys,frame)&&!guides?.[frame])return base;let result={...base};
  for(const field of Object.keys(defaults)){
@@ -25,6 +25,7 @@ export function guidedPose(keys,guides,frame,total,loop,base){
   result[field]=value(nodes,weights,n=>(n.key?keys[n.frame]:n.guide.pose)[field]??defaults[field]);
  }
  for(const field of ['shake','blur'].filter(k=>result[k]!==undefined))result[field]=Math.max(0,Math.min(100,result[field]??0));
+ for(const field of ['mirrorX','mirrorY'].filter(k=>result[k]!==undefined))result[field]=Math.max(-1,Math.min(1,result[field]));
  result.opacity=Math.max(0,Math.min(1,result.opacity));for(const field of ['scale','scaleX','scaleY'])if(result[field]!==undefined)result[field]=Math.max(.01,result[field]);
  const nodes=guideSpan(keys,guides,frame,total,loop,g=>g.fields?.includes('corners'));if(nodes){
   const poses=nodes.map(n=>n.key?keys[n.frame]:n.guide.pose),domains=poses.map(p=>p.warpBounds).filter(Boolean);let domain;

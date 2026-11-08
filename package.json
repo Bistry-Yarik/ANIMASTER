@@ -1,6 +1,6 @@
 {
   "name": "animaster",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,7 +13,7 @@
     "predev": "node build.js",
     "desktop": "npm run build && electron .",
     "build:win": "npm run build && electron-builder --win portable --x64",
-    "test:ui": "npm run build && node tests/editor-browser.cjs && node tests/studio-browser.cjs && node tests/frames-browser.cjs && node tests/upgrades-browser.cjs && node tests/media-browser.cjs && node tests/selection-browser.cjs && node tests/alta-browser.cjs && node tests/effects-browser.cjs",
+    "test:ui": "npm run build && node tests/editor-browser.cjs && node tests/studio-browser.cjs && node tests/frames-browser.cjs && node tests/upgrades-browser.cjs && node tests/media-browser.cjs && node tests/selection-browser.cjs && node tests/alta-browser.cjs && node tests/effects-browser.cjs && node tests/mirror-fonts-browser.cjs",
     "build:icon": "node scripts/build-icon.cjs"
   },
   "devDependencies": {
@@ -40,7 +40,8 @@
       "desktop/library.cjs",
       "assets/icon.png",
       "assets/flags/LICENSE",
-      "package.json"
+      "package.json",
+      "assets/fonts/*-OFL.txt"
     ],
     "afterPack": "desktop/after-pack.cjs",
     "win": {

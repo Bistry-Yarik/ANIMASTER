@@ -1,6 +1,6 @@
 import {territoryComponents,paintTerritory,encodeOwners,decodeOwners} from './territories.js';
 import {MAP_COUNTRIES,COUNTRY_FLAGS} from './templates.js';
-export const TEXT_FONTS=['Arial','Verdana','Georgia','Times New Roman','Courier New','sans-serif'];
+export const TEXT_FONTS=['Arial','Verdana','Georgia','Times New Roman','Courier New','sans-serif','Lobster','Pacifico','Caveat','Oswald','Rubik','Russo One','Comfortaa','Amatic SC','Tahoma','Trebuchet MS','Impact','Comic Sans MS','Palatino Linotype','Lucida Console'];
 const flagCache=new Map();
 export function loadFlag(code,src=COUNTRY_FLAGS[code]){
  if(!flagCache.has(src))flagCache.set(src,new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(Error('Флаг не загрузился: '+code));image.src=src;}));

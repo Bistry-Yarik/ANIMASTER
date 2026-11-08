@@ -42,3 +42,7 @@
 .cell.alt-guide{color:#8cf3ff!important;background:#196b7638;font-size:8px;border-bottom:2px solid #71d9ed}#addAlt{color:#8cf3ff}
 
 #theme{max-width:115px;font-size:11px;padding:6px}html[data-theme="dark"]{background:#09090d;color:#dad9e4}html[data-theme="dark"] header,html[data-theme="dark"] .tools,html[data-theme="dark"] .properties,html[data-theme="dark"] .timeline{background:#101016}html[data-theme="dark"] .stage-area,html[data-theme="dark"] .canvas-area{background:#0b0b10}html[data-theme="dark"] button,html[data-theme="dark"] input,html[data-theme="dark"] select{background-color:#181820;border-color:#30303c}html[data-theme="dark"] button.active{background:#7155ed}html[data-theme="dark"] #stage{background:conic-gradient(#22212c 25%,#2b2936 0 50%,#22212c 0 75%,#2b2936 0) 0 0/20px 20px}html[data-theme="dark"] .primary{background:#adf086;color:#172114}
+
+#fontMenu{grid-column:1/-1;margin:8px 0}#fontMenu summary{cursor:pointer;padding:10px;background:#26272f;border:1px solid #45414f;border-radius:7px}#fontSamples{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px;max-height:280px;overflow:auto;padding:8px 2px}#fontSamples button{text-align:left;font-size:21px;min-height:48px}#fontSamples button[aria-pressed="true"]{border-color:#adf086;background:#343b2e}#textFont{font-size:18px}
+
+#fontMenu{position:relative}#fontSamples{position:absolute;left:0;top:100%;width:min(480px,72vw);z-index:30;background:#18191e;border:1px solid #45414f;border-radius:8px;padding:8px;box-shadow:0 8px 24px #0008}
