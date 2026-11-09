@@ -1,0 +1,13 @@
+{
+  "status": "failure",
+  "tag": "linux-v2.0.2",
+  "source_commit": "26fff363c4542187db6cd96c69687ec87aebaed9",
+  "run_url": "https://github.com/Bistry-Yarik/ANIMASTER/actions/runs/42616740626",
+  "release_url": "https://github.com/Bistry-Yarik/ANIMASTER/releases/tag/linux-v2.0.2",
+  "install_result": "success",
+  "check_result": "success",
+  "build_result": "failure",
+  "smoke_result": "skipped",
+  "publish_result": "skipped",
+  "completed_at": "2026-11-09T12:26:52.249996+00:00"
+}
