@@ -14,7 +14,8 @@
     "desktop": "npm run build && electron .",
     "build:win": "npm run build && electron-builder --win portable --x64",
     "test:ui": "npm run build && node tests/editor-browser.cjs && node tests/studio-browser.cjs && node tests/frames-browser.cjs && node tests/upgrades-browser.cjs && node tests/media-browser.cjs && node tests/selection-browser.cjs && node tests/alta-browser.cjs && node tests/effects-browser.cjs && node tests/mirror-fonts-browser.cjs && node tests/ams-browser.cjs",
-    "build:icon": "node scripts/build-icon.cjs"
+    "build:icon": "node scripts/build-icon.cjs",
+    "build:linux": "npm run build && electron-builder --linux AppImage tar.gz --x64"
   },
   "devDependencies": {
     "electron": "45.2.2",
@@ -60,6 +61,28 @@
     "portable": {
       "artifactName": "AMS-${version}-Windows.exe",
       "requestExecutionLevel": "user"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "tar.gz",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "executableName": "ams",
+      "icon": "assets/icon.png",
+      "category": "Graphics",
+      "artifactName": "AMS-${version}-Linux-x64.${ext}",
+      "syncDesktopName": true
     }
-  }
+  },
+  "desktopName": "com.animaster.studio"
 }

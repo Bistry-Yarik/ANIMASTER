@@ -1,0 +1,109 @@
+name: Build and publish AMS for Linux
+
+on:
+  push:
+    tags:
+      - 'linux-v*'
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Linux release tag to publish
+        required: true
+        default: linux-v2.0.2
+
+permissions:
+  contents: write
+
+concurrency:
+  group: linux-release-${{ github.event.inputs.release_tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      RELEASE_TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install pinned build dependencies
+        id: install
+        run: npm ci --no-audit --no-fund
+      - name: Check application
+        id: check
+        run: |
+          npm run check
+          npm test
+      - name: Build AppImage and portable archive
+        id: build
+        run: npm run build:linux
+      - name: Verify packaged AppImage
+        id: smoke
+        run: |
+          mkdir -p /tmp/ams-appimage-test
+          image=$(realpath dist/AMS-*-Linux-x64.AppImage)
+          (cd /tmp/ams-appimage-test && "$image" --appimage-extract >/dev/null)
+          AMS_EXECUTABLE=/tmp/ams-appimage-test/squashfs-root/AppRun node tests/desktop-smoke.cjs
+          archive=$(realpath dist/AMS-*-Linux-x64.tar.gz)
+          asar_path=$(tar -tzf "$archive" | awk '/\/resources\/app.asar$/ {print}')
+          test -n "$asar_path"
+          tar -xOf "$archive" "$asar_path" | cmp - /tmp/ams-appimage-test/squashfs-root/resources/app.asar
+      - name: Calculate checksums
+        run: |
+          cd dist
+          sha256sum AMS-*-Linux-x64.AppImage AMS-*-Linux-x64.tar.gz > SHA256SUMS-Linux.txt
+      - name: Publish downloadable Linux release
+        id: publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" dist/AMS-*-Linux-x64.AppImage dist/AMS-*-Linux-x64.tar.gz dist/SHA256SUMS-Linux.txt --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$RELEASE_TAG" dist/AMS-*-Linux-x64.AppImage dist/AMS-*-Linux-x64.tar.gz dist/SHA256SUMS-Linux.txt --verify-tag --latest=false --repo "$GITHUB_REPOSITORY" --title "AMS ${RELEASE_TAG#linux-v} — Linux x64" --notes-file desktop/RELEASE-NOTES-LINUX.md
+          fi
+      - name: Save release result for verification over Git
+        if: always()
+        env:
+          RELEASE_RESULT: ${{ job.status }}
+          INSTALL_RESULT: ${{ steps.install.outcome }}
+          CHECK_RESULT: ${{ steps.check.outcome }}
+          BUILD_RESULT: ${{ steps.build.outcome }}
+          SMOKE_RESULT: ${{ steps.smoke.outcome }}
+          PUBLISH_RESULT: ${{ steps.publish.outcome }}
+        run: |
+          source_commit=$(git rev-parse HEAD)
+          export RELEASE_SOURCE="$source_commit"
+          git fetch origin main
+          git switch --force-create linux-release-report origin/main
+          python3 - <<'PY'
+          import json, os, datetime
+          report = {
+              'status': os.environ['RELEASE_RESULT'],
+              'tag': os.environ['RELEASE_TAG'],
+              'source_commit': os.environ['RELEASE_SOURCE'],
+              'run_url': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+              'release_url': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/releases/tag/{os.environ['RELEASE_TAG']}",
+              'install_result': os.environ['INSTALL_RESULT'],
+              'check_result': os.environ['CHECK_RESULT'],
+              'build_result': os.environ['BUILD_RESULT'],
+              'smoke_result': os.environ['SMOKE_RESULT'],
+              'publish_result': os.environ['PUBLISH_RESULT'],
+              'completed_at': datetime.datetime.now(datetime.timezone.utc).isoformat()
+          }
+          with open('desktop/linux-release-status.json', 'w') as file:
+              json.dump(report, file, indent=2)
+              file.write('\n')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add desktop/linux-release-status.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Report Linux release result'
+          git push origin HEAD:main
