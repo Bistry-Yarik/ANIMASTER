@@ -1,13 +1,13 @@
 {
-  "status": "failure",
-  "tag": "linux-v2.0.2",
-  "source_commit": "26fff363c4542187db6cd96c69687ec87aebaed9",
-  "run_url": "https://github.com/Bistry-Yarik/ANIMASTER/actions/runs/42616740626",
-  "release_url": "https://github.com/Bistry-Yarik/ANIMASTER/releases/tag/linux-v2.0.2",
+  "status": "success",
+  "tag": "linux-v2.0.3",
+  "source_commit": "b4ad0f25dba59bd41653f9ec9dd00484a51ff369",
+  "run_url": "https://github.com/Bistry-Yarik/ANIMASTER/actions/runs/42619047724",
+  "release_url": "https://github.com/Bistry-Yarik/ANIMASTER/releases/tag/linux-v2.0.3",
   "install_result": "success",
   "check_result": "success",
-  "build_result": "failure",
-  "smoke_result": "skipped",
-  "publish_result": "skipped",
-  "completed_at": "2026-11-09T12:26:52.249996+00:00"
+  "build_result": "success",
+  "smoke_result": "success",
+  "publish_result": "success",
+  "completed_at": "2026-11-09T12:43:54.038740+00:00"
 }
