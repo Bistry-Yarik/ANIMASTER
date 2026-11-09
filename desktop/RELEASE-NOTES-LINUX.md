@@ -1,19 +1,19 @@
-# AMS 2.0.2 для Linux x64
+# AMS 2.0.3 для Linux x64
 
-- **AMS-2.0.2-Linux-x64.AppImage** — переносимый файл приложения с иконкой, редактором, заставкой и локальным сообществом.
-- **AMS-2.0.2-Linux-x64.tar.gz** — архив приложения для запуска без AppImage/FUSE. Распакуйте архив и запустите файл `ams` внутри.
+- **AMS-2.0.3-Linux-x64.AppImage** — переносимый файл приложения с иконкой, редактором, заставкой и локальным сообществом.
+- **AMS-2.0.3-Linux-x64.tar.gz** — архив приложения для запуска без AppImage/FUSE. Распакуйте архив и запустите файл `ams` внутри.
 
 Для AppImage разрешите запуск файла в его свойствах или выполните:
 
 ```bash
-chmod +x AMS-2.0.2-Linux-x64.AppImage
-./AMS-2.0.2-Linux-x64.AppImage
+chmod +x AMS-2.0.3-Linux-x64.AppImage
+./AMS-2.0.3-Linux-x64.AppImage
 ```
 
 Для систем без FUSE можно извлечь AppImage и запустить приложение:
 
 ```bash
-./AMS-2.0.2-Linux-x64.AppImage --appimage-extract
+./AMS-2.0.3-Linux-x64.AppImage --appimage-extract
 ./squashfs-root/AppRun
 ```
 

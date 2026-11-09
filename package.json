@@ -1,6 +1,6 @@
 {
   "name": "animaster",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "private": true,
   "type": "module",
   "scripts": {
@@ -15,7 +15,7 @@
     "build:win": "npm run build && electron-builder --win portable --x64",
     "test:ui": "npm run build && node tests/editor-browser.cjs && node tests/studio-browser.cjs && node tests/frames-browser.cjs && node tests/upgrades-browser.cjs && node tests/media-browser.cjs && node tests/selection-browser.cjs && node tests/alta-browser.cjs && node tests/effects-browser.cjs && node tests/mirror-fonts-browser.cjs && node tests/ams-browser.cjs",
     "build:icon": "node scripts/build-icon.cjs",
-    "build:linux": "npm run build && electron-builder --linux AppImage tar.gz --x64"
+    "build:linux": "npm run build && electron-builder --linux AppImage tar.gz --x64 --publish never"
   },
   "devDependencies": {
     "electron": "45.2.2",

@@ -53,9 +53,9 @@ npm start
 
 ## Linux x64
 
-Готовая Linux-версия: [скачать AppImage и tar.gz](https://github.com/Bistry-Yarik/ANIMASTER/releases/tag/linux-v2.0.2).
+Готовая Linux-версия: [скачать AppImage и tar.gz](https://github.com/Bistry-Yarik/ANIMASTER/releases/tag/linux-v2.0.3).
 
-Разрешите запуск AppImage в свойствах файла или выполните `chmod +x AMS-2.0.2-Linux-x64.AppImage`, затем откройте файл. Если FUSE недоступен, распакуйте tar.gz и запустите `ams` из полученной папки. Подробности: [инструкция Linux](desktop/RELEASE-NOTES-LINUX.md).
+Разрешите запуск AppImage в свойствах файла или выполните `chmod +x AMS-2.0.3-Linux-x64.AppImage`, затем откройте файл. Если FUSE недоступен, распакуйте tar.gz и запустите `ams` из полученной папки. Подробности: [инструкция Linux](desktop/RELEASE-NOTES-LINUX.md).
 
 Сборка из исходников: `npm ci` и `npm run build:linux`. AppImage и архив появляются в `dist`. Автоматический выпуск запускается тегами `linux-v*`, независимо от Windows-сборок.
 
